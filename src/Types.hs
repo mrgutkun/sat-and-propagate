@@ -25,7 +25,7 @@ data Literal = Literal
 
 instance Show Literal where
   show (Literal l True) = show l
-  show (Literal l False) = show "¬" <> show l
+  show (Literal l False) = "¬" <> show l
 
 newtype Variable = Variable Int
   deriving (Eq, Ord)

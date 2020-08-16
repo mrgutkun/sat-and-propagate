@@ -3,6 +3,8 @@ module Main where
 import Types
 import Solvers
 
+import InstanceGen (genInstances)
+
 main :: IO ()
 main = undefined
 
