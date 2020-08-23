@@ -2,7 +2,7 @@ module Types where
 
 import Data.List (intercalate)
 
-data Formula = Formula { f_clauses :: [Clause]}
+data Formula = Formula { f_clauses :: [Clause] }
   deriving (Eq)
 
 instance Show Formula where
@@ -11,7 +11,7 @@ instance Show Formula where
     intercalate " /\\ " $
       map (\cl -> "(" <> show cl <> ")") cls
 
-data Clause = Clause {c_literals :: [Literal]}
+data Clause = Clause { c_literals :: [Literal] }
   deriving (Eq)
 
 instance Show Clause where
@@ -19,7 +19,7 @@ instance Show Clause where
 
 data Literal = Literal 
   { l_variable :: Variable
-  , l_unvalue :: Bool
+  , l_value :: Bool
   }
   deriving (Eq)
 

@@ -4,13 +4,14 @@ module Solvers
   )
 where
 
+import Control.Applicative ((<|>))
 import Control.Monad (guard)
 import Data.Map (Map)
 
 import qualified Data.Map as Map
 
 import Types (Formula(..), Variable(..), Clause(..), Literal(..))
-import Common(simplify, variables, nullClauses, tryEither)
+import Common (simplify, variables, nullClauses)
 
 solveBrute :: Formula -> Maybe (Map Variable Bool)
 solveBrute f = solve' f Map.empty
@@ -43,3 +44,14 @@ solveProp f = solve' f Map.empty
       case variables f' of
         [] -> Just assignments'
         v : _ -> tryEither solve' v f' assignments'
+
+
+tryEither ::
+  (Formula -> Map Variable Bool -> Maybe (Map Variable Bool)) ->
+  Variable ->
+  Formula ->
+  Map Variable Bool ->
+  Maybe (Map Variable Bool)
+tryEither solver v f assignments =
+  solver (simplify v True f) (Map.insert v True assignments)
+    <|> solver (simplify v False f) (Map.insert v False assignments)

@@ -1,24 +1,11 @@
 {-# LANGUAGE RecordWildCards #-}
 module Common where
 
-import Control.Applicative ((<|>))
-
 import Data.List (nub)
 import Data.Map (Map)
 import qualified Data.Map as Map
 
 import Types (Formula(..), Variable, Clause(..), Literal(..))
-
-tryEither ::
-  (Formula -> Map Variable Bool -> Maybe (Map Variable Bool)) ->
-  Variable ->
-  Formula ->
-  Map Variable Bool ->
-  Maybe (Map Variable Bool)
-tryEither solver v f assignments =
-  solver (simplify v True f) (Map.insert v True assignments)
-    <|> solver (simplify v False f) (Map.insert v False assignments)
-
 
 variables :: Formula -> [Variable]
 variables Formula{..} = nub $ concatMap variables' f_clauses
