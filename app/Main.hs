@@ -3,38 +3,43 @@ module Main where
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-import Types
+import qualified Types as T
 import qualified Solve
 import qualified SolveM
 
 
-import InstanceGen (genInstances)
+import InstanceGen (GenParams(..), genInstances, easyParams, hardParams)
 
 main :: IO ()
 main = undefined
 
-test :: Int ->
-  ( [Maybe (Variable, Bool)]
-  , [Maybe (Variable, Bool)]
-  , [Maybe (Variable, Bool)]
-  , [Maybe (Variable, Bool)]
+test :: GenParams ->
+  ( [Maybe (T.Variable, Bool)]
+  , [Maybe (T.Variable, Bool)]
+  , [Maybe (T.Variable, Bool)]
+  , [Maybe (T.Variable, Bool)]
   )
-test n =
-  let brute  = probeSolver n Solve.brute
-      bruteM = probeSolver n SolveM.brute
-      prop   = probeSolver n Solve.prop
-      propM  = probeSolver n SolveM.prop
+test params =
+  let brute  = probeSolver params Solve.brute
+      bruteM = probeSolver params SolveM.brute
+      prop   = probeSolver params Solve.prop
+      propM  = probeSolver params SolveM.prop
   in (brute, bruteM, prop, propM)
 
-probeSolver :: Functor f => Int -> ((Formula -> f (Map k a)) -> [f (k, a)])
-probeSolver n = map (fmap $ Map.elemAt 1) . testSolver n
+probeSolver :: Functor f => GenParams -> ((T.Formula -> f (Map k a)) -> [f (k, a)])
+probeSolver params = map (fmap $ Map.elemAt 1) . testSolver params
 
-testSolver :: Int -> (Formula -> b) -> [b]
-testSolver n s = map s $ genInstances n n
+testSolver :: GenParams -> (T.Formula -> b) -> [b]
+testSolver params solver  =
+  map solver $ genInstances params
 
-example :: Formula
+example :: T.Formula
 example =
-  Formula
-    [ Clause [Literal (Variable 3) True, Literal (Variable 2) False],
-      Clause [Literal (Variable 3) False]
+  T.Formula
+    [ T.Clause
+        [ T.Literal (T.Variable 3) True
+        , T.Literal (T.Variable 2) False
+        ]
+    , T.Clause
+        [ T.Literal (T.Variable 3) False ]
     ]
