@@ -1,8 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE BlockArguments #-}
-module SolverM
-  ( solveBrute
-  , solveProp
+module SolveM
+  ( brute
+  , prop
   )
 where
 
@@ -18,18 +18,18 @@ import qualified Data.Map as Map
 import Types (Formula(..), Variable(..), Clause(..), Literal(..))
 import Common(simplify, variables, nullClauses)
 
-data SolveState = SolveState
+data LocalState = LocalState
   { s_formula :: Formula
   , s_evaluation :: Map Variable Bool
   }
 
-type Solve = State SolveState
+type Solve = State LocalState
 
-solveBrute :: Formula -> Maybe (Map Variable Bool)
-solveBrute f = solve (SolveState f Map.empty)
+brute :: Formula -> Maybe (Map Variable Bool)
+brute f = solve (LocalState f Map.empty)
   where
-    solve :: SolveState -> Maybe (Map Variable Bool)
-    solve s@SolveState{..} = do
+    solve :: LocalState -> Maybe (Map Variable Bool)
+    solve s@LocalState{..} = do
       guard . not $ nullClauses s_formula
       case variables s_formula of
         [] -> Just s_evaluation
@@ -64,10 +64,10 @@ whileM prop action = do
     else pure ()
 
 
-solveProp :: Formula -> Maybe (Map Variable Bool)
-solveProp f = solve $ SolveState f Map.empty
+prop :: Formula -> Maybe (Map Variable Bool)
+prop f = solve $ LocalState f Map.empty
   where
-    solve :: SolveState -> Maybe (Map Variable Bool)
+    solve :: LocalState -> Maybe (Map Variable Bool)
     solve s = do
       guard . not . nullClauses $ s_formula s
       let s' = execState propagateUnits s
@@ -79,17 +79,17 @@ solveProp f = solve $ SolveState f Map.empty
 
 withEither
   :: Variable
-  -> SolveState
-  -> (SolveState, SolveState)
-withEither var s@SolveState{..} =
+  -> LocalState
+  -> (LocalState, LocalState)
+withEither var s@LocalState{..} =
   (withTrue, withFalse)
   where
     withTrue = execState (withVarValue var True) s
     withFalse = execState (withVarValue var False) s
 
 withVarValue :: Variable -> Bool -> Solve ()
-withVarValue var value = modify $ \SolveState{..} ->
-  SolveState
+withVarValue var value = modify $ \LocalState{..} ->
+  LocalState
     { s_formula    = simplify var value s_formula
     , s_evaluation = Map.insert var value s_evaluation
     }

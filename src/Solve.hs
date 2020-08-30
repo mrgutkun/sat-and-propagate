@@ -1,6 +1,6 @@
-module Solvers
-  ( solveBrute
-  , solveProp
+module Solve
+  ( brute
+  , prop
   )
 where
 
@@ -13,8 +13,8 @@ import qualified Data.Map as Map
 import Types (Formula(..), Variable(..), Clause(..), Literal(..))
 import Common (simplify, variables, nullClauses)
 
-solveBrute :: Formula -> Maybe (Map Variable Bool)
-solveBrute f = solve' f Map.empty
+brute :: Formula -> Maybe (Map Variable Bool)
+brute f = solve' f Map.empty
   where
     solve' :: Formula -> Map Variable Bool -> Maybe (Map Variable Bool)
     solve' f assignments = do
@@ -34,8 +34,8 @@ propagateUnits (f@(Formula cls), assignments) =
     propagate (Literal var val) (f, assignments) =
       (simplify var val f, Map.insert var val assignments)
 
-solveProp :: Formula -> Maybe (Map Variable Bool)
-solveProp f = solve' f Map.empty
+prop :: Formula -> Maybe (Map Variable Bool)
+prop f = solve' f Map.empty
   where
     solve' :: Formula -> Map Variable Bool -> Maybe (Map Variable Bool)
     solve' f assignments = do

@@ -1,31 +1,34 @@
+{-# LANGUAGE LambdaCase #-}
 module Types where
 
 import Data.List (intercalate)
 
-data Formula = Formula { f_clauses :: [Clause] }
+newtype Formula = Formula { f_clauses :: [Clause] }
   deriving (Eq)
 
 instance Show Formula where
-  show (Formula []) = "()"
-  show (Formula cls) =
-    intercalate " /\\ " $
-      map (\cl -> "(" <> show cl <> ")") cls
+  show = \case
+    Formula []  -> "()"
+    Formula cls ->
+      intercalate " /\\ " $
+        map (\cl -> "(" <> show cl <> ")") cls
 
-data Clause = Clause { c_literals :: [Literal] }
+newtype Clause = Clause { c_literals :: [Literal] }
   deriving (Eq)
 
 instance Show Clause where
   show (Clause ls) = intercalate " \\/ " $ map show ls
 
-data Literal = Literal 
+data Literal = Literal
   { l_variable :: Variable
   , l_value :: Bool
   }
   deriving (Eq)
 
 instance Show Literal where
-  show (Literal l True) = show l
-  show (Literal l False) = "¬" <> show l
+  show = \case
+    Literal l True  -> show l
+    Literal l False -> "¬" <> show l
 
 newtype Variable = Variable Int
   deriving (Eq, Ord)
